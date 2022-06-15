@@ -72,19 +72,31 @@
 
 /*trying to do ajax  */
 const express = require("express");
-const products = require("./products");
-
+const logger = require("morgan");
 const fs = require("fs/promises");
-const moment = require("moment")
+const moment = require("moment");
 const cors = require("cors");
+const products = require("./products");
 const productsRouter = require("./routes/api/products");
 const app = express();
+const formatsLogger = app.get("env") === "development" ? "dev" : "short";
+
+app.use(logger(formatsLogger));
 app.use(cors());
 /*when you send a POST req you need to use that */
-app.use(express.json())
+app.use(express.json());
 
 app.use("/api/products", productsRouter);
 
-app.listen(3000);
+app.use((req, res) => {
+  res.status(404).json({ mesage: "Not found" });
+});
+
+app.use((err, req, res, next) => {
+  const { status = 500, message = "Server error" } = err;
+  res.status(status).json({ message: err.message });
+});
+
+module.exports = app;
 
 
