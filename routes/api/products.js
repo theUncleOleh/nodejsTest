@@ -144,4 +144,47 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.put("/:id", async (req, res, next) => {
+  try {
+    const { error } = productSchema.validate(req.body);
+    if (error) {
+      error.status = 400;
+      throw error;
+    }
+    const { id } = req.params;
+    const result = await productsOperations.updateById(id, req.body);
+    if (!result) {
+      throw createError(404, `Product with id=${id}not found `);
+    }
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        result,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await productsOperations.removeProduct(id);
+    if (!result) {
+      throw createError(404, `Product with id=${id}not found `);
+    }
+    res.json({
+      status: "200",
+      code: 200,
+      data: {
+        result,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

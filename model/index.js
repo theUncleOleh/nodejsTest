@@ -20,29 +20,40 @@ async function getProductById(productId) {
   return result;
 }
 
-// async function removeContact(contactId) {
-//   const contacts = await listContacts();
-//   const idx = contacts.findIndex((item) => item.id === contactId);
-//   if (idx === -1) {
-//     return null;
-//   }
-//   const [remove] = contacts.splice(idx, 1);
-//   await update(contacts);
-//   return remove;
-// }
-
-async function addProduct(name, price) {
+async function removeProduct(id) {
   const products = await listProducts();
-  const newProduct = { id: v4(), name, price };
+  const idx = products.findIndex((item) => item.id === id);
+  if (idx === -1) {
+    return null;
+  }
+  const [remove] = products.splice(idx, 1);
+  await update(products);
+  return remove;
+}
+
+async function addProduct(data) {
+  const products = await listProducts();
+  const newProduct = { id: v4(), ...data };
   products.push(newProduct);
   await update(products);
   return newProduct;
+}
+async function updateById(id, data) {
+  const products = await listProducts();
+  const idx = products.findIndex((item) => item.id === id);
+  if (idx === -1) {
+    return null;
+  }
+  products[idx] = { ...data, id };
+  await update(products);
+  return products[idx];
 }
 
 const productsOperations = {
   listProducts,
   addProduct,
-  // removeContact,
+  updateById,
+  removeProduct,
   getProductById,
 };
 module.exports = productsOperations;
